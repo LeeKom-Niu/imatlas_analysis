@@ -1,0 +1,17 @@
+*.pyc
+__pycache__/
+*.RData
+*.Rhistory
+*.csv
+*.tsv
+*.bed
+*.bam
+*.bai
+*.fastq
+*.fq
+*.fa
+*.fasta
+*.png
+*.pdf
+*.svg
+.DS_Store
