@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-viral_i-motif_density_by_host.py  (v2 - Nature 风格 + 窄柱 + iM)
+viral_i-motif_density_by_host.py  (v2 - Nature style + narrow bars + iM)
 
 Viral iM density by host type (eukaryote vs prokaryote)
 
-输出:
+Output:
   viral_iM_density_by_host_euk_prok.png / .pdf
 
-字体: pdf.fonttype = 42 (Illustrator 可编辑)
+Font: pdf.fonttype = 42 (editable in Illustrator)
 """
 
 import numpy as np

@@ -28,7 +28,7 @@ clean = pd.read_csv(CLEAN_FILE, sep='\t')[['Genome', 'genome_length_bp']]
 merged = counts.merge(clean, on='Genome', how='left')
 missing_len = merged['genome_length_bp'].isna().sum()
 if missing_len > 0:
-    print(f"[WARNING] {missing_len} 个物种在 clean 表中找不到基因组长度，将导致绝对密度为 NaN！")
+    print(f"[WARNING] {missing_len} species have no genome length in the clean table; absolute density will be NaN!")
     print(merged[merged['genome_length_bp'].isna()]['Genome'].tolist()[:10], "...")
 
 # Compute totals
@@ -42,7 +42,7 @@ for t in types:
 rel_data[types] = rel_data[types].fillna(0)
 rel_out = os.path.join(BASE_DIR, 'tree_relative_proportion.tsv')
 rel_data.to_csv(rel_out, sep='\t', index=False)
-print(f"[OK] 相对比例数据已保存: {rel_out}")
+print(f"[OK] Relative proportion data saved: {rel_out}")
 
 # Generate dataset 2: absolute density iMs/Mb (alternative for stacked bar chart)
 abs_data = merged[['Genome', 'Domain']].copy()
@@ -51,7 +51,7 @@ for t in types:
     abs_data[t] = (merged[t] / 2) / (merged['genome_length_bp'] / 1e6)
 abs_out = os.path.join(BASE_DIR, 'tree_absolute_density.tsv')
 abs_data.to_csv(abs_out, sep='\t', index=False)
-print(f"[OK] 绝对密度数据已保存: {abs_out}")
+print(f"[OK] Absolute density data saved: {abs_out}")
 
 # Generate dataset 3: total density log10 (for heatmap/bubble plot on the outer ring of the tree)
 total_data = abs_data[['Genome', 'Domain']].copy()
@@ -59,4 +59,4 @@ total_data['Total_Density'] = abs_data[types].sum(axis=1)
 total_data['Total_log10'] = np.log10(total_data['Total_Density'] + 1)
 total_out = os.path.join(BASE_DIR, 'tree_total_density.tsv')
 total_data[['Genome', 'Domain', 'Total_Density', 'Total_log10']].to_csv(total_out, sep='\t', index=False)
-print(f"[OK] 总密度/热图数据已保存: {total_out}")
+print(f"[OK] Total density/heatmap data saved: {total_out}")

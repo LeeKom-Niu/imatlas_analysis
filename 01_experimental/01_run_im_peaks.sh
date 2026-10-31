@@ -7,7 +7,7 @@
 set -e  # stop immediately on error
 
 echo "========================================"
-echo "开始处理 GSE220878 iM-CUT&Tag 数据"
+echo "Starting GSE220878 iM-CUT&Tag data processing"
 echo "========================================"
 
 # 1. Enter the data directory
@@ -20,7 +20,7 @@ mkdir -p ../GSE220878_results
 RESULT_DIR="../GSE220878_results"
 
 echo ""
-echo "[步骤1] 批量转换 bigwig → bedgraph，并运行 SEACR..."
+echo "[Step 1] Batch convert bigwig → bedgraph and run SEACR..."
 
 # 4. Loop over the 6 iM samples (3 HEK293T + 3 WDLPS)
 for bw in GSM7507863_HEK_iM_rep1.bigwig \
@@ -33,7 +33,7 @@ for bw in GSM7507863_HEK_iM_rep1.bigwig \
     # Strip the .bigwig suffix to get the base name
     base=${bw%.bigwig}
     
-    echo "  -> 处理 ${base} ..."
+    echo "  -> Processing ${base} ..."
     
     # Convert to bedgraph (intermediate file)
     bigWigToBedGraph $bw ${base}.bedgraph
@@ -48,10 +48,10 @@ for bw in GSM7507863_HEK_iM_rep1.bigwig \
     rm ${base}.bedgraph
 done
 
-echo "[步骤1] 完成！6 个样本的 BED 文件已生成。"
+echo "[Step 1] Done! BED files generated for 6 samples."
 
 echo ""
-echo "[步骤2] 分别取交集，获得高置信度 iM 峰..."
+echo "[Step 2] Intersect replicates to obtain high-confidence iM peaks..."
 
 # 5. Enter the results directory
 cd ${RESULT_DIR} || exit
@@ -62,7 +62,7 @@ bedtools intersect -a GSM7507863_HEK_iM_rep1.bed \
                       GSM7507865_HEK_iM_rep3.bed \
                    -u > HEK293T_iM_highConf_intersect.bed
 
-echo "  -> HEK293T 交集完成: $(wc -l < HEK293T_iM_highConf_intersect.bed) 个峰"
+echo "  -> HEK293T intersection done: $(wc -l < HEK293T_iM_highConf_intersect.bed) peaks"
 
 # 7. Intersect the three WDLPS replicates
 bedtools intersect -a GSM7507869_WDLPS_iM_rep1.bed \
@@ -70,18 +70,18 @@ bedtools intersect -a GSM7507869_WDLPS_iM_rep1.bed \
                       GSM7507871_WDLPS_iM_rep3.bed \
                    -u > WDLPS_iM_highConf_intersect.bed
 
-echo "  -> WDLPS 交集完成: $(wc -l < WDLPS_iM_highConf_intersect.bed) 个峰"
+echo "  -> WDLPS intersection done: $(wc -l < WDLPS_iM_highConf_intersect.bed) peaks"
 
 echo ""
-echo "[步骤2] 完成！"
+echo "[Step 2] Done!"
 echo ""
 echo "========================================"
-echo "所有 iM 数据处理完成！结果文件列表："
+echo "All iM data processing complete! Result file list:"
 echo "========================================"
 ls -lh *.bed | awk '{print "  " $9 " (" $5 ")"}'
 echo ""
-echo "高置信度峰（交集）:"
+echo "High-confidence peaks (intersection):"
 echo "  - HEK293T_iM_highConf_intersect.bed"
 echo "  - WDLPS_iM_highConf_intersect.bed"
 echo ""
-echo "输出目录: ${RESULT_DIR}"
+echo "Output directory: ${RESULT_DIR}"

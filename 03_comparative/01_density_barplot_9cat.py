@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 12_density_barplot_9cat.py
-基于最新整理的数据 (iM_summary_clean.tsv) 生成 9 分类密度横向柱状图。
-包含：
-- 横向柱状图（按平均密度降序）
-- 单色系渐变配色
-- Mean ± SEM 误差棒
-- 数值标注
+Generate a 9-category density horizontal bar plot from the latest curated data (iM_summary_clean.tsv).
+Includes:
+- Horizontal bar plot (sorted by mean density, descending)
+- Single-hue gradient color scheme
+- Mean ± SEM error bars
+- Value labels
 """
 from _common import *
 import matplotlib.pyplot as plt

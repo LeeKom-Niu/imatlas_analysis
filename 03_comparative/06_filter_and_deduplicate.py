@@ -5,7 +5,7 @@ import os
 BASE_DIR = '/datapool/home/2023200496/niulk/my_project/09_type'
 
 # 1. Read total density file
-print("正在读取总密度文件进行去重和名称清洗...")
+print("Reading total density file for deduplication and name cleaning...")
 df_total = pd.read_csv(f'{BASE_DIR}/tree_total_density.tsv', sep='\t')
 
 # Filter out entries with zero density
@@ -35,7 +35,7 @@ df_dedup = df_total.drop_duplicates(subset=['CleanGenome'], keep='first').copy()
 name_map = dict(zip(df_dedup['Genome'], df_dedup['CleanGenome']))
 keep_genomes = set(df_dedup['Genome'])
 
-print(f"去重完成！原始物种数: {len(df_total)}，去重后保留: {len(df_dedup)} 个")
+print(f"Deduplication complete! Original species: {len(df_total)}, retained after deduplication: {len(df_dedup)}")
 
 # 5. Apply cleaning and filtering to all three files
 files_to_filter = [
@@ -60,9 +60,9 @@ for fname in files_to_filter:
     # Save
     out_path = f'{BASE_DIR}/{fname.replace(".tsv", "_filtered.tsv")}'
     df_filtered.to_csv(out_path, sep='\t', index=False)
-    print(f"已保存: {out_path} (行数: {len(df_filtered)})")
+    print(f"Saved: {out_path} (rows: {len(df_filtered)})")
 
 # 6. Also output the list of retained clean names to help check the tree file
 df_dedup[['CleanGenome', 'Domain']].to_csv(f'{BASE_DIR}/kept_species_names.txt', sep='\t', index=False, header=False)
-print("\n全部完成！请使用带 _filtered 后缀的三个文件去网页工具画图。")
-print("同时输出了 kept_species_names.txt，你可以用它核对树文件的叶子名。")
+print("\nAll done! Use the three _filtered files with the web tool to make plots.")
+print("kept_species_names.txt was also output; use it to check the leaf names in the tree file.")

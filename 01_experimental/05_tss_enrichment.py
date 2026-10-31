@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-0333_tss_enrichment.py  (v11 - 主图去掉 CI，只画曲线 + 填充)
+0333_tss_enrichment.py  (v11 - CI removed from main figure, curves + fill only)
 
-- combined_TSS_facet（主图）：单样本曲线，无 CI
-- combined_TSS_species_mean_facet（附图）：均值 ± SEM + 统计框
+- combined_TSS_facet (main figure): per-sample curves, no CI
+- combined_TSS_species_mean_facet (supplementary figure): mean ± SEM + statistics box
 """
 
 import os
@@ -286,7 +286,7 @@ def process_species(species, genome_dir, peak_dir, outdir, window,
     chrom_sizes = read_chrom_sizes(genome_dir / f'{species}.chrom.sizes')
     genes = read_genes_bed(genome_dir / f'{species}_genes.bed')
     if genes.empty or not chrom_sizes:
-        raise SystemExit(f'[{label}] 缺少 genes.bed 或 chrom.sizes')
+        raise SystemExit(f'[{label}] missing genes.bed or chrom.sizes')
     genome_total = sum(chrom_sizes.values())
     print(f'[{label}] genes={len(genes)}  genome={genome_total:,} bp')
     if species == 'human':
@@ -305,7 +305,7 @@ def process_species(species, genome_dir, peak_dir, outdir, window,
             continue
         peak_files.append(p)
     if not peak_files:
-        raise SystemExit(f'[{label}] 没有可用的非 G4 peak 文件')
+        raise SystemExit(f'[{label}] no usable non-G4 peak files')
     positions = np.arange(-window, window + 1)
     results = {}
     for pf in peak_files:
@@ -313,11 +313,11 @@ def process_species(species, genome_dir, peak_dir, outdir, window,
         print(f'  [{sample}]', end='  ', flush=True)
         peaks = read_peak_bed(pf, min_qvalue=min_qvalue)
         if peaks.empty:
-            print(f'空文件（过滤后），跳过（min_qvalue={min_qvalue}）')
+            print(f'Empty file (after filtering), skipping (min_qvalue={min_qvalue})')
             continue
         peaks = peaks[peaks['chrom'].isin(chrom_sizes.keys())]
         if peaks.empty:
-            print('染色体名不匹配，跳过')
+            print('Chromosome names do not match, skipping')
             continue
         lookup = build_peak_lookup(peaks)
         arr, n_genes = accumulate_tss(genes, lookup, window)
@@ -415,8 +415,8 @@ def plot_group_mean(label, results, groups, outdir, window):
 # Combined plot 1: facets (main figure, no CI, no stats box)
 def plot_combined_facet(results_h, results_r, outdir, window):
     """
-    单样本曲线图：只画曲线 + 曲线下方填充装饰。
-    不画 CI（CI 放均值图），不画统计框。
+    Per-sample curve plot: draw only the curves plus decorative fill beneath them.
+    No CI is drawn (CI is shown in the mean plot), and no statistics box is drawn.
     """
     fig = plt.figure(figsize=(10, 8.5))
     gs = GridSpec(2, 1, hspace=0.30,

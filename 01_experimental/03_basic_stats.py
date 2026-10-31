@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """
-011_basic_stats.py  (v3 - Nature 配色 + 可编辑 PDF + 顺序/颜色调整)
+011_basic_stats.py  (v3 - Nature color scheme + editable PDF + order/color adjustments)
 
-对所有 iM 数据（人类 + 水稻）进行基础统计，并将峰值数量绘制在同一柱形图中。
-输出目录：011_basic_stats
+Basic statistics for all iM data (human + rice), with peak counts plotted in the same bar chart.
+Output directory: 011_basic_stats
 
-人类数据：
+Human data:
   - HEK293T / WDLPS : CUT&Tag (iM)
-  - GSE248445       : DIP-seq (iMab 抗体, 3 个单细胞 + 1 个 3-cell shared)
-水稻数据：
-  - IP_vs_IgG_intersect.narrowPeak    ← GSE234751 CK-7 iM-IP vs IgG（pH 7.0，未处理）
-  - IP_vs_Input_intersect.narrowPeak  ← GSE184783 iM-IP vs Input（水稻幼苗）
+  - GSE248445       : DIP-seq (iMab antibody, 3 single-cell samples + 1 3-cell shared)
+Rice data:
+  - IP_vs_IgG_intersect.narrowPeak    ← GSE234751 CK-7 iM-IP vs IgG (pH 7.0, untreated)
+  - IP_vs_Input_intersect.narrowPeak  ← GSE184783 iM-IP vs Input (rice seedlings)
 
-Nature 配色：
-  - Human CUT&Tag : 深蓝
-  - Human DIP-seq : 浅蓝（同一色系）
-  - Rice Input    : 深绿（seedling，重点）
-  - Rice IgG      : 浅绿（同一色系）
+Nature color scheme:
+  - Human CUT&Tag : dark blue
+  - Human DIP-seq : light blue (same color family)
+  - Rice Input    : dark green (seedling, highlighted)
+  - Rice IgG      : light green (same color family)
 """
 
 import os

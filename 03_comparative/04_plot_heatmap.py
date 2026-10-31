@@ -37,7 +37,7 @@ print(f'After mapping and filtering: {len(df)} species')
 species_fold_out = f'{OUT_DIR}/all_species_fold_enrichment.tsv'
 df[['Species', 'Classification_9cat', 'Genome_density', 
     'Prom_fold', 'Gene_fold', 'Down_fold', 'Distal_fold']].to_csv(species_fold_out, sep='\t', index=False)
-print(f'[OK] 每个物种的 Fold 数据已保存至: {species_fold_out}')
+print(f'[OK] Fold data for each species saved to: {species_fold_out}')
 
 # 3. Compute summary statistics per category and region (Median, Mean, Q1, Q3)
 summary = []
@@ -58,7 +58,7 @@ sum_df = pd.DataFrame(summary).set_index('Category').reindex(EUK_6)
 # New: save the summary table behind the heatmap
 summary_out = f'{OUT_DIR}/heatmap_summary_stats.tsv'
 sum_df.to_csv(summary_out, sep='\t')
-print(f'[OK] 热图汇总统计（Median/Mean/IQR）已保存至: {summary_out}')
+print(f'[OK] Heatmap summary statistics (Median/Mean/IQR) saved to: {summary_out}')
 
 # 4. Draw heatmap (using median data)
 plot_data = sum_df[[f'{r}_median' for r in regions]].copy()
@@ -82,4 +82,4 @@ plt.tight_layout()
 out_path = f'{OUT_SUPP}/panel_heatmap_enrichment.png'
 fig.savefig(out_path, dpi=300, bbox_inches='tight')
 fig.savefig(out_path.replace('.png', '.pdf'), dpi=300, bbox_inches='tight')
-print(f'[OK] 热图已保存至: {out_path}')
+print(f'[OK] Heatmap saved to: {out_path}')

@@ -142,7 +142,7 @@ def plot_panel(ax, df, region, colors, title="", letter="", show_ylabel=False, s
 
 # 4. Main program
 def main():
-    print("正在生成主图 (Figure 5 A-H)...")
+    print("Generating main figure (Figure 5 A-H)...")
     fig, axes = plt.subplots(4, 2, figsize=(12, 18)) # slightly larger canvas to prevent crowding with large fonts
     
     domains = ['Archaea', 'Bacteria', 'Eukaryota', 'Viruses']
@@ -166,9 +166,9 @@ def main():
     fig.savefig(main_out.replace('.pdf', '.png'), dpi=300)
     fig.savefig(main_out.replace('.pdf', '.svg'))
     plt.close(fig)
-    print(f"✅ 主图已保存: {main_out} (pdf/png/svg)")
+    print(f"✅ Main figure saved: {main_out} (pdf/png/svg)")
 
-    print("\n正在生成真核子分类附图...")
+    print("\nGenerating eukaryotic subcategory supplementary figures...")
     euk_category_dir = os.path.join(BASE_DIR, '05_eukaryote_domain_0506', 'category_plots_eukaryote')
     
     for cat_key, cat_name in CATEGORY_NAMES.items():
@@ -195,9 +195,9 @@ def main():
         fig_cat.savefig(cat_out.replace('.pdf', '.png'), dpi=300)
         fig_cat.savefig(cat_out.replace('.pdf', '.svg'))
         plt.close(fig_cat)
-        print(f"✅ 子图已保存: {cat_out} (pdf/png/svg)")
+        print(f"✅ Subfigure saved: {cat_out} (pdf/png/svg)")
 
-    print("\n🎉 所有图片制作完成！去 Final_Figure5_Plots 文件夹查看吧。")
+    print("\n🎉 All figures complete! Check the Final_Figure5_Plots folder.")
 
 if __name__ == "__main__":
     main()

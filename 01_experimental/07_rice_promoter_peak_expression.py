@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-011_rice_promoter_peak_expression.py  (v2 - Nature 配色 + 可编辑 PDF)
+011_rice_promoter_peak_expression.py  (v2 - Nature color scheme + editable PDF)
 
-水稻：启动子区有 seedling IP peak 的基因 vs 全部基因的表达分布
+Rice: expression distribution of genes with a seedling IP peak in the promoter vs all genes
 
-- 统计检验：完整数据，Mann-Whitney U 单侧
-- 绘图：IQR 去离群后
-- 每个组合画三张图：小提琴 / 柱状图 / 箱线图
-- 每个组合又分：原始 TPM / log10(TPM+1)
-- 可编辑 PDF（pdf.fonttype = 42）
+- Statistical test: full data, one-sided Mann-Whitney U
+- Plotting: after IQR outlier removal
+- Three plots per comparison: violin / bar / box
+- Each comparison split by: raw TPM / log10(TPM+1)
+- Editable PDF (pdf.fonttype = 42)
 
-配色：
-  iM IP-seq seedling peak near TSS : 深绿 #238B45
-  All Genes                        : 中性灰 #BDBDBD
+Colors:
+  iM IP-seq seedling peak near TSS : dark green #238B45
+  All Genes                        : neutral gray #BDBDBD
 """
 
 import subprocess
@@ -71,13 +71,13 @@ OUT_TABLE = "rice_gene_expression_peak_status.tsv"
 
 # Find genes with a peak in the promoter region
 def get_genes_with_peak(promoter, peak, label):
-    print(f"--- 找启动子区有 peak 的基因: {label} ---")
+    print(f"--- Find genes with a peak in the promoter region: {label} ---")
     cmd = (f"grep -v '^#' {promoter} | "
            f"bedtools intersect -a - -b {peak} -wa -u")
     result = subprocess.run(cmd, shell=True,
                             capture_output=True, text=True)
     if result.returncode != 0:
-        raise RuntimeError(f"bedtools 失败 ({label}):\n{result.stderr}")
+        raise RuntimeError(f"bedtools failed ({label}):\n{result.stderr}")
     genes = set()
     for line in result.stdout.strip().split('\n'):
         if line.strip() == '':
@@ -85,30 +85,30 @@ def get_genes_with_peak(promoter, peak, label):
         parts = line.split('\t')
         if len(parts) >= 4:
             genes.add(parts[3])
-    print(f"    有 peak 的基因数: {len(genes)}")
+    print(f"    Genes with a peak: {len(genes)}")
     return genes
 
 
-print("=== 1. 启动子与 peak 取交集 ===")
+print("=== 1. Intersect promoters with peaks ===")
 genes_seedling = get_genes_with_peak(PROMOTER, PEAK_SEEDLING,
                                      "Rice IP-seq (seedling)")
 
 # Read TPM
-print("\n=== 2. 读取 TPM ===")
+print("\n=== 2. Read TPM ===")
 tpm = pd.read_csv(TPM_FILE)
 tpm_cols = [c for c in tpm.columns if c.startswith('NP_mock')]
-print(f"TPM 重复列: {tpm_cols}")
+print(f"TPM replicate columns: {tpm_cols}")
 
 tpm['TPM_mean'] = tpm[tpm_cols].mean(axis=1)
 tpm_exp = tpm[(tpm[tpm_cols] > 0).any(axis=1)].copy()
-print(f"表达基因数: {len(tpm_exp)}")
+print(f"Expressed genes: {len(tpm_exp)}")
 
 tpm_exp['has_seedling'] = tpm_exp['gene_id'].isin(genes_seedling)
 
 n_seedling = int(tpm_exp['has_seedling'].sum())
 n_all = len(tpm_exp)
-print(f"有 seedling peak 且有表达的基因: {n_seedling}")
-print(f"全部表达基因: {n_all}")
+print(f"Genes with a seedling peak and expression: {n_seedling}")
+print(f"All expressed genes: {n_all}")
 
 # Extract expression values
 seedling_expr = tpm_exp[tpm_exp['has_seedling']]['TPM_mean'].values
@@ -126,7 +126,7 @@ _, p_seed = stats.mannwhitneyu(seedling_expr, all_expr,
                                alternative='greater')
 star_seed = p_to_star(p_seed)
 print(f"\nseedling vs All: p = {p_seed:.3e} ({star_seed}), "
-      f"中位数 seedling={np.median(seedling_expr):.3f}, "
+      f"median seedling={np.median(seedling_expr):.3f}, "
       f"All={np.median(all_expr):.3f}")
 
 # IQR outlier removal
@@ -142,7 +142,7 @@ def remove_outliers(x):
 
 seedling_clean = remove_outliers(seedling_expr)
 all_clean = remove_outliers(all_expr)
-print(f"去离群后：seedling={len(seedling_clean)}, All={len(all_clean)}")
+print(f"After outlier removal: seedling={len(seedling_clean)}, All={len(all_clean)}")
 
 
 # Shared plotting helpers
@@ -214,7 +214,7 @@ def draw_violin(data_list, labels, colors, stars,
     fig.savefig(f"{out_prefix}.png", dpi=300, bbox_inches='tight')
     fig.savefig(f"{out_prefix}.pdf", dpi=300, bbox_inches='tight')
     plt.close(fig)
-    print(f"  小提琴: {out_prefix}.pdf/.png")
+    print(f"  Violin: {out_prefix}.pdf/.png")
 
 
 # Figure 2: bar chart (mean ± SEM)
@@ -265,7 +265,7 @@ def draw_bar(data_list, labels, colors, stars,
     fig.savefig(f"{out_prefix}.png", dpi=300, bbox_inches='tight')
     fig.savefig(f"{out_prefix}.pdf", dpi=300, bbox_inches='tight')
     plt.close(fig)
-    print(f"  柱状图: {out_prefix}.pdf/.png")
+    print(f"  Bar: {out_prefix}.pdf/.png")
 
 
 # Figure 3: box plot + jittered scatter points
@@ -312,7 +312,7 @@ def draw_box(data_list, labels, colors, stars,
     fig.savefig(f"{out_prefix}.png", dpi=300, bbox_inches='tight')
     fig.savefig(f"{out_prefix}.pdf", dpi=300, bbox_inches='tight')
     plt.close(fig)
-    print(f"  箱线图: {out_prefix}.pdf/.png")
+    print(f"  Box: {out_prefix}.pdf/.png")
 
 
 # Main workflow
@@ -322,7 +322,7 @@ labels = ['Rice iM-IP\n(seedling)', 'All Genes']
 colors = [COLOR_PEAK, COLOR_ALL]
 stars  = [star_seed, 'ns']
 
-print("\n--- 去离群 + 原始 TPM ---")
+print("\n--- IQR-filtered + raw TPM ---")
 draw_violin([seedling_clean, all_clean], labels, colors, stars,
             out_prefix="rice_iqr_raw_violin",
             title="Rice: IQR-filtered, raw TPM",
@@ -338,7 +338,7 @@ draw_box([seedling_clean, all_clean], labels, colors, stars,
          title="Rice: IQR-filtered, raw TPM (box)",
          log_transform=False)
 
-print("\n--- 去离群 + log10(TPM+1) ---")
+print("\n--- IQR-filtered + log10(TPM+1) ---")
 draw_violin([seedling_clean, all_clean], labels, colors, stars,
             out_prefix="rice_iqr_log_violin",
             title="Rice: IQR-filtered, log10(TPM+1)",
@@ -357,5 +357,5 @@ draw_box([seedling_clean, all_clean], labels, colors, stars,
 # Save table
 tpm_exp[['gene_id', 'TPM_mean', 'has_seedling']].to_csv(
     OUT_TABLE, sep='\t', index=False)
-print(f"\n保存为 {OUT_TABLE}")
-print("全部完成。")
+print(f"\nSaved as {OUT_TABLE}")
+print("All done.")

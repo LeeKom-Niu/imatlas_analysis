@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-03_genomic_region_stacked_bar.py  (v3 - 主图 + 附图分开输出，样本名重命名)
+03_genomic_region_stacked_bar.py  (v3 - main and supplementary figures output separately, sample names renamed)
 
-对每个数据集的 iM peaks 进行四区域分类（互斥，加起来 = 100%）：
-  1. Promoter          : TSS 上游 1 kb
-  2. Gene body         : TSS 到 TES
-  3. Downstream        : TES 下游 1 kb
-  4. Distal intergenic : 以上之外
+Four-region classification of iM peaks per dataset (mutually exclusive, summing to 100%):
+  1. Promoter          : 1 kb upstream of TSS
+  2. Gene body         : TSS to TES
+  3. Downstream        : 1 kb downstream of TES
+  4. Distal intergenic : outside the above
 
-优先级：Promoter > Gene body > Downstream > Intergenic
+Priority: Promoter > Gene body > Downstream > Intergenic
 
-输出：
-  主图：--main 指定的数据集
-  附图：--supp 指定的数据集
+Output:
+  Main figure: datasets specified by --main
+  Supplementary figure: datasets specified by --supp
 
-用法：
+Usage:
   cd ~/niulk/my_project/19_modified_analysis/10_iMab/05_Experiment_analysis
 
   python3 03_genomic_region_stacked_bar.py \\
@@ -236,7 +236,7 @@ def build_region_cache(genome_dirs, species_map, promoter_len, downstream_len):
         genes_bed = read_bed6(gd / f'{species}_genes.bed')
 
         if not chrom_sizes or genes_bed.empty:
-            print(f'  [warn] {coord} 缺 chrom.sizes 或 genes.bed，跳过')
+            print(f'  [warn] {coord} missing chrom.sizes or genes.bed, skipping')
             continue
 
         prom_df, gene_df, down_df = build_regions_from_genes(
@@ -261,12 +261,12 @@ def build_region_cache(genome_dirs, species_map, promoter_len, downstream_len):
 # Classify one dataset
 def process_one(name, coord, peak_path, region_cache):
     if coord not in region_cache:
-        print(f'  [skip] {name}: 坐标 {coord} 未提供 genome 目录')
+        print(f'  [skip] {name}: no genome directory provided for coordinate {coord}')
         return None
 
     peaks = read_bed3(peak_path)
     if peaks.empty:
-        print(f'  [skip] {name}: 空文件')
+        print(f'  [skip] {name}: empty file')
         return None
 
     r = region_cache[coord]
@@ -368,17 +368,17 @@ def main():
     ap.add_argument('--genome_rice', default=None)
     ap.add_argument('--main', nargs=3, action='append', default=[],
                     metavar=('NAME', 'COORD', 'PEAK_BED'),
-                    help='主图数据集')
+                    help='main figure datasets')
     ap.add_argument('--supp', nargs=3, action='append', default=[],
                     metavar=('NAME', 'COORD', 'PEAK_BED'),
-                    help='附图数据集')
+                    help='supplementary figure datasets')
     ap.add_argument('--outdir', required=True)
     ap.add_argument('--promoter_len', type=int, default=1000)
     ap.add_argument('--downstream_len', type=int, default=1000)
     args = ap.parse_args()
 
     if not args.main and not args.supp:
-        raise SystemExit('必须至少指定 --main 或 --supp')
+        raise SystemExit('At least one of --main or --supp must be specified')
 
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)

@@ -2,11 +2,11 @@
 """
 12_main_panels.py  (v19)
 
-改动（相对 v18）：
-  - fmt_rho 改为动态小数位：
-      |rho| < 0.005  → 用 4 位小数显示（如 "-0.0003"），保留方向
-      |rho| 正好为 0 → "0.00"
-      其它           → 2 位小数（如 "+0.11"）
+Changes (relative to v18):
+  - fmt_rho now uses dynamic decimal places:
+      |rho| < 0.005   → display with 4 decimal places (e.g. "-0.0003"), preserving direction
+      |rho| exactly 0 → "0.00"
+      otherwise       → 2 decimal places (e.g. "+0.11")
 """
 
 import argparse
@@ -79,12 +79,12 @@ def fmt_p(p):
 
 def fmt_rho(rho, ndigits=2, eps_small=0.005, ndigits_small=4):
     """
-    动态小数位格式化 rho：
-      - |rho| < 10^-4          → "0.00"（真·零）
-      - |rho| < eps_small      → 用 ndigits_small 位小数，保留符号
-                                 例如 -0.000288 → "-0.0003"
-      - 否则                   → 用 ndigits 位小数，保留符号
-                                 例如 +0.109826 → "+0.11"
+    Format rho with dynamic decimal places:
+      - |rho| < 10^-4          → "0.00" (true zero)
+      - |rho| < eps_small      → ndigits_small decimal places, preserving sign
+                                 e.g. -0.000288 → "-0.0003"
+      - otherwise              → ndigits decimal places, preserving sign
+                                 e.g. +0.109826 → "+0.11"
     """
     if rho is None or (isinstance(rho, float) and np.isnan(rho)):
         return 'nan'
@@ -529,13 +529,13 @@ def main():
     ap.add_argument('--outdir', required=True)
     ap.add_argument('--dpi', type=int, default=300)
     ap.add_argument('--iqr-k', type=float, default=2.0,
-                    help='Panel b 的 IQR 过滤系数（默认 2.0）。')
+                    help='IQR filter coefficient for Panel b (default 2.0).')
     ap.add_argument('--common-n', dest='common_n',
                     action='store_true', default=True,
-                    help='Panel b 所有特征使用同一批样本（默认开启）。')
+                    help='Use the same set of samples for all features in Panel b (default on).')
     ap.add_argument('--no-common-n', dest='common_n',
                     action='store_false',
-                    help='关闭统一样本，回到每个特征独立过滤。')
+                    help='Disable common samples and revert to independent filtering per feature.')
     args = ap.parse_args()
 
     outdir = Path(args.outdir)
@@ -543,12 +543,12 @@ def main():
 
     df = pd.read_csv(args.input, sep='\t')
     df = df[df['ctracNum'].notna()].reset_index(drop=True)
-    print(f'载入 {len(df)} 条有效 iM 序列')
-    print(f'pHT 样本: {df["pHT"].notna().sum()}')
+    print(f'Loaded {len(df)} valid iM sequences')
+    print(f'pHT samples: {df["pHT"].notna().sum()}')
     print(f'Panel b IQR k = {args.iqr_k} '
-          f'({"开启" if args.iqr_k > 0 else "关闭"})')
-    print(f'Panel b 统一样本: {"开启" if args.common_n else "关闭"}')
-    print(f'Panel c 过滤: 关闭')
+          f'({"on" if args.iqr_k > 0 else "off"})')
+    print(f'Panel b common samples: {"on" if args.common_n else "off"}')
+    print(f'Panel c filtering: off')
 
     set_nature_style()
 
@@ -565,8 +565,8 @@ def main():
     if args.common_n:
         common_mask_b, n_base_b, n_final_b = get_common_mask(
             df, LOOP_PANELS, iqr_k=args.iqr_k)
-        print(f'\nPanel b 统一样本: '
-              f'共同非空 {n_base_b} → IQR 交集 {n_final_b}')
+        print(f'\nPanel b common samples: '
+              f'common non-null {n_base_b} → IQR intersection {n_final_b}')
     else:
         common_mask_b, n_base_b = None, None
 
@@ -650,7 +650,7 @@ def main():
                     dpi=args.dpi, bbox_inches='tight')
     plt.close(fig_all)
     print(f'\nsaved: fig2_main_combined.png')
-    print(f'\n完成，结果在 {outdir}')
+    print(f'\nDone, results in {outdir}')
 
 
 if __name__ == '__main__':

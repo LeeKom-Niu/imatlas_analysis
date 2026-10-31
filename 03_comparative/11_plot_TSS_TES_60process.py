@@ -27,11 +27,11 @@ gene_file_suffix = "gene_with_strand.bed"
 imotif_file_suffix = "imotif_with_strand.bed"
 
 def init_worker():
-    """初始化工作进程"""
+    """Initialize worker process"""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 def calculate_enrichment_optimized(args):
-    """优化版本 - 减少内存使用"""
+    """Optimized version - reduced memory usage"""
     gene_file, imotif_file, genome_name = args
     try:
         # Efficient data types
@@ -123,7 +123,7 @@ def calculate_enrichment_optimized(args):
         return {"genome": genome_name, "error": str(e)}
 
 def bootstrap_confidence_optimized(data, n_bootstrap=1000, ci=95):
-    """优化的bootstrap计算，保持1000次但使用矩阵运算加速"""
+    """Optimized bootstrap computation retaining 1000 iterations, accelerated with matrix operations"""
     n_samples = len(data)
     if n_samples == 0:
         return np.zeros_like(data[0]), np.zeros_like(data[0])
@@ -142,7 +142,7 @@ def bootstrap_confidence_optimized(data, n_bootstrap=1000, ci=95):
     return lower, upper
 
 def plot_enrichment(df, region, name, output_dir, with_ci=True):
-    """绘制富集度图表"""
+    """Plot enrichment figure"""
     plt.figure(figsize=(10, 5))
     
     # Template strand
@@ -179,7 +179,7 @@ def plot_enrichment(df, region, name, output_dir, with_ci=True):
     plt.close()
 
 def process_genomes_parallel(base_dir):
-    """并行处理流程"""
+    """Parallel processing pipeline"""
     os.makedirs(output_dir, exist_ok=True)
     print("Scanning genome directories...")
     subdirs = glob(os.path.join(base_dir, '*/output_genomic'))
@@ -228,7 +228,7 @@ def process_genomes_parallel(base_dir):
     return results
 
 def save_single_genome_result(result):
-    """保存单个基因组结果"""
+    """Save per-genome results"""
     genome_name = result["genome"]
     genome_dir = os.path.join(output_dir, "genome_results", genome_name)
     os.makedirs(genome_dir, exist_ok=True)
@@ -244,7 +244,7 @@ def save_single_genome_result(result):
         df.to_csv(os.path.join(genome_dir, f"{region}_results.tsv"), sep="\t", index=False)
 
 def monitor_system_resources():
-    """监控系统资源使用情况"""
+    """Monitor system resource usage"""
     memory = psutil.virtual_memory()
     return {
         'memory_used_gb': memory.used / (1024**3),
@@ -253,7 +253,7 @@ def monitor_system_resources():
     }
 
 def save_final_results_with_ci(results):
-    """保存最终结果，使用1000次bootstrap计算置信区间"""
+    """Save final results with confidence intervals from 1000 bootstrap iterations"""
     if not results:
         print("No valid results to process!")
         return {}
@@ -313,7 +313,7 @@ if __name__ == "__main__":
     print(f"Output directory: {output_dir}")
     print(f"Window size: ±{window_size}bp, Resolution: 1bp")
     print(f"Parallel processes: {n_processes}")
-    print(f"Bootstrap iterations: {bootstrap_n} (保持1000次确保统计可靠性)")
+    print(f"Bootstrap iterations: {bootstrap_n} (1000 iterations maintained to ensure statistical reliability)")
     
     # Process data
     results = process_genomes_parallel(base_dir)

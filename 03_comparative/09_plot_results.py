@@ -89,4 +89,4 @@ plt.savefig(f'{base}/Supplementary_Fig_Total_Density_Boxplot.pdf', bbox_inches='
 plt.savefig(f'{base}/Supplementary_Fig_Total_Density_Boxplot.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("✅ 两张附图均已保存！")
+print("✅ Both supplementary figures saved!")

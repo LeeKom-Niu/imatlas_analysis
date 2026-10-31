@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-022_plot_hek293t_promoter_expression.py  (v2 - Nature 配色 + 可编辑 PDF)
+022_plot_hek293t_promoter_expression.py  (v2 - Nature color scheme + editable PDF)
 
-HEK293T：CUT&Tag iM 启动子关联基因 vs 全部基因的表达分布
+HEK293T: expression distribution of CUT&Tag iM promoter-associated genes vs all genes
 
-- 统计检验：完整数据，Mann-Whitney U 单侧
-- 绘图：IQR 去离群后
-- 每个组合画三张图：小提琴 / 柱状图 / 箱线图
-- 每个组合又分：原始 TPM / log10(TPM+1)
-- 可编辑 PDF（pdf.fonttype = 42）
+- Statistical test: full data, one-sided Mann-Whitney U
+- Plotting: after IQR outlier removal
+- Three plots per comparison: violin / bar / box
+- Each comparison split by: raw TPM / log10(TPM+1)
+- Editable PDF (pdf.fonttype = 42)
 
-配色：
-  iM CUT&Tag near TSS : 深蓝 #08519C
-  All Genes           : 中性灰 #BDBDBD
+Colors:
+  iM CUT&Tag near TSS : dark blue #08519C
+  All Genes           : neutral gray #BDBDBD
 """
 
 import re
@@ -84,7 +84,7 @@ cut_tag_overlap = pd.read_csv("CUTTag_iM_promoter_overlap.bed",
 cut_tag_genes = set(
     cut_tag_overlap.iloc[:, 9].apply(strip_version).unique()
 )
-print(f"CUT&Tag 启动子关联基因数: {len(cut_tag_genes)}")
+print(f"CUT&Tag promoter-associated gene count: {len(cut_tag_genes)}")
 
 # 3. Extract expression values
 cut_tag_expr = gene_tpm_exp[
@@ -92,8 +92,8 @@ cut_tag_expr = gene_tpm_exp[
 ]['TPM_mean'].values
 all_expr = gene_tpm_exp['TPM_mean'].values
 
-print(f"CUT&Tag 匹配到表达的基因数: {len(cut_tag_expr)}")
-print(f"全部表达基因数: {len(all_expr)}")
+print(f"CUT&Tag genes matched to expression: {len(cut_tag_expr)}")
+print(f"Total expressed genes: {len(all_expr)}")
 
 # 4. Statistical test (full data)
 def p_to_star(p):
@@ -120,7 +120,7 @@ def remove_outliers(x):
 
 cut_tag_clean = remove_outliers(cut_tag_expr)
 all_clean = remove_outliers(all_expr)
-print(f"去离群后：CUT&Tag={len(cut_tag_clean)}, All={len(all_clean)}")
+print(f"After outlier removal: CUT&Tag={len(cut_tag_clean)}, All={len(all_clean)}")
 
 
 # Shared plotting helpers
@@ -131,7 +131,7 @@ def _prepare(data_list, log_transform):
 
 
 def _sig_bar(ax, x1, x2, y, star, h):
-    """显著性横线 + 星号"""
+    """Significance bar + asterisk"""
     ax.plot([x1, x1, x2, x2],
             [y, y + h, y + h, y],
             color='black', lw=1.0, zorder=10)
@@ -142,7 +142,7 @@ def _sig_bar(ax, x1, x2, y, star, h):
 
 def _draw_jitter(ax, data_list, colors, max_points=1500,
                  point_size=1.4, alpha=0.18):
-    """抖散点"""
+    """Jittered scatter points"""
     for i, data in enumerate(data_list):
         x_pos = i + 1
         if len(data) > max_points:
@@ -198,7 +198,7 @@ def draw_violin(data_list, labels, colors, stars,
     fig.savefig(f"{out_prefix}.png", dpi=300, bbox_inches='tight')
     fig.savefig(f"{out_prefix}.pdf", dpi=300, bbox_inches='tight')
     plt.close(fig)
-    print(f"  小提琴: {out_prefix}.pdf/.png")
+    print(f"  Violin: {out_prefix}.pdf/.png")
 
 
 # Figure 2: bar chart (mean ± SEM)
@@ -253,7 +253,7 @@ def draw_bar(data_list, labels, colors, stars,
     fig.savefig(f"{out_prefix}.png", dpi=300, bbox_inches='tight')
     fig.savefig(f"{out_prefix}.pdf", dpi=300, bbox_inches='tight')
     plt.close(fig)
-    print(f"  柱状图: {out_prefix}.pdf/.png")
+    print(f"  Bar: {out_prefix}.pdf/.png")
 
 
 # Figure 3: box plot + jittered scatter points
@@ -304,7 +304,7 @@ def draw_box(data_list, labels, colors, stars,
     fig.savefig(f"{out_prefix}.png", dpi=300, bbox_inches='tight')
     fig.savefig(f"{out_prefix}.pdf", dpi=300, bbox_inches='tight')
     plt.close(fig)
-    print(f"  箱线图: {out_prefix}.pdf/.png")
+    print(f"  Box: {out_prefix}.pdf/.png")
 
 
 # Main workflow
@@ -314,7 +314,7 @@ labels = ['iM CUT&Tag\nnear TSS', 'All Genes']
 colors = [COLOR_PEAK, COLOR_ALL]
 stars  = [star_cut, 'ns']
 
-print("\n--- 去离群 + 原始 TPM ---")
+print("\n--- IQR-filtered + raw TPM ---")
 draw_violin([cut_tag_clean, all_clean], labels, colors, stars,
             out_prefix="hek293t_iqr_raw_violin",
             title="HEK293T: IQR-filtered, raw TPM",
@@ -330,7 +330,7 @@ draw_box([cut_tag_clean, all_clean], labels, colors, stars,
          title="HEK293T: IQR-filtered, raw TPM (box)",
          log_transform=False)
 
-print("\n--- 去离群 + log10(TPM+1) ---")
+print("\n--- IQR-filtered + log10(TPM+1) ---")
 draw_violin([cut_tag_clean, all_clean], labels, colors, stars,
             out_prefix="hek293t_iqr_log_violin",
             title="HEK293T: IQR-filtered, log10(TPM+1)",
@@ -346,4 +346,4 @@ draw_box([cut_tag_clean, all_clean], labels, colors, stars,
          title="HEK293T: IQR-filtered, log10(TPM+1) (box)",
          log_transform=True)
 
-print("\n全部完成。")
+print("\nAll done.")
